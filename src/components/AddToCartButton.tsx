@@ -1,11 +1,12 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
+import { type Product } from "@prisma/client";
 import { ShoppingCart, Check } from "lucide-react";
 import { useState } from "react";
 
 interface AddToCartButtonProps {
-  product: any;
+  product: Product;
   className?: string;
 }
 
