@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(products || []);
@@ -23,18 +23,37 @@ export async function POST(request: Request) {
         name: data.name,
         description: data.description,
         price: Number(data.price) || 0,
-        originalPrice: data.originalPrice ? Number(data.originalPrice) : null,
-        flashSalePrice: data.flashSalePrice ? Number(data.flashSalePrice) : null,
-        saleStartTime: data.saleStartTime ? new Date(data.saleStartTime) : null,
-        saleEndTime: data.saleEndTime ? new Date(data.saleEndTime) : null,
+        originalPrice: data.originalPrice
+          ? Number(data.originalPrice)
+          : null,
+        flashSalePrice: data.flashSalePrice
+          ? Number(data.flashSalePrice)
+          : null,
+        saleStartTime: data.saleStartTime
+          ? new Date(data.saleStartTime)
+          : null,
+        saleEndTime: data.saleEndTime
+          ? new Date(data.saleEndTime)
+          : null,
         category: data.category,
         brand: data.brand,
         images: JSON.stringify(data.images || []),
         stock: Number(data.stock) || 0,
         featured: Boolean(data.featured),
         tags: JSON.stringify(data.tags || []),
-      }
+      },
     });
+
+    return NextResponse.json(product, { status: 201 });
+  } catch (error) {
+    console.error("Error creating product:", error);
+
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
+  }
+}    });
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
