@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               String      @id @default(cuid())
+  name             String
+  description      String
+  price            Decimal     // Stored as INR
+  originalPrice    Decimal?    // Stored as INR
+  flashSalePrice   Decimal?    // Stored as INR
+  flashSaleEnabled Boolean     @default(false)
+  flashSaleStock   Int         @default(0)
+  saleStartTime    DateTime?
+  saleEndTime      DateTime?
+  category         String
+  brand            String
+  images           String      // Serialized JSON array of URLs
+  stock            Int         @default(0)
+  rating           Float       @default(0)
+  reviewsCount     Int         @default(0)
+  featured         Boolean     @default(false)
+  tags             String      // Serialized JSON array of tags
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  orderItems       OrderItem[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  razorpayId      String?     @unique
+  totalAmount     Float
+  status          String      @default("PENDING") // PENDING, PAID, FAILED, CANCELLED
+  customerEmail   String?
+  customerName    String?
+  isFlashSale     Boolean     @default(false)
+  paymentMethod   String?
+  shippingAddress String?
+  trackingId      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
