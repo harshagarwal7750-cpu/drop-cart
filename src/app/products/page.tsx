@@ -70,7 +70,7 @@ export default function ProductsPage() {
 
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xl font-bold">
-                  ₹{product.price.toNumber()}
+                  ₹{product.price}
                 </span>
               </div>
 
