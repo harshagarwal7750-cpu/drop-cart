@@ -2,28 +2,49 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { type Product } from "@prisma/client";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("Products API did not return array:", data);
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Failed to load products:", error);
+        setProducts([]);
+      }
+    }
+
+    loadProducts();
   }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
-
       <h1 className="text-3xl font-bold mb-10 text-white">
         All Products
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((product) => {
+          let images: string[] = [];
 
-          const images = JSON.parse(product.images || "[]");
+          try {
+            images = JSON.parse(product.images || "[]");
+          } catch {
+            images = [];
+          }
+
           const image = images[0];
 
           return (
@@ -49,7 +70,7 @@ export default function ProductsPage() {
 
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xl font-bold">
-                  ₹{product.price}
+                  ₹{product.price.toNumber()}
                 </span>
               </div>
 
